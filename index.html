@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MiniMart Ceria 🛒</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"Trebuchet MS",Arial,sans-serif;background:#dff5ee;color:#5b5b70}
+button{font:inherit;cursor:pointer;border:0}
+header{background:linear-gradient(90deg,#ffc9df,#c8eaff,#c9f1d9);padding:15px;text-align:center;border-bottom:5px solid white}
+h1{margin:0;color:#df6f9c;font-size:clamp(28px,7vw,48px);text-shadow:2px 2px white}
+header p{margin:4px}
+.stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:12px auto;max-width:1100px}
+.stat{background:#fff;border:3px solid white;border-radius:16px;padding:8px 15px;box-shadow:0 4px 10px #7773;font-weight:bold}
+.store{max-width:1100px;margin:auto;padding:10px}
+.customer{background:#fff;border:4px solid #ffc9df;border-radius:24px;padding:12px;text-align:center;box-shadow:0 5px 14px #7773;margin-bottom:12px}
+.customer span{font-size:50px}
+.customer h2{margin:3px;color:#d9749d}
+.shop{display:grid;grid-template-columns:1fr 285px;gap:14px}
+.market{background:#f8ffff;border:5px solid white;border-radius:28px;padding:12px;box-shadow:0 7px 18px #7773}
+.sign{background:#a9dff5;color:#55788b;border-radius:15px;padding:9px;text-align:center;font-size:20px;font-weight:bold;margin-bottom:10px}
+.aisle{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.product{background:white;border:3px solid #e4f7ee;border-radius:18px;padding:9px;text-align:center;box-shadow:0 4px 8px #7772;transition:.15s}
+.product:hover{transform:translateY(-3px)}
+.product .emoji{font-size:48px}
+.product h3{font-size:15px;margin:4px}
+.price{color:#5fa584;font-weight:bold}
+.buy{margin-top:6px;background:#ffbfd8;color:#79586a;padding:8px 11px;border-radius:12px;box-shadow:0 3px #df9bb8;font-weight:bold}
+.buy:active{transform:translateY(2px);box-shadow:0 1px #df9bb8}
+.cart{background:#fff;border:5px solid #c7f0dc;border-radius:28px;padding:14px;box-shadow:0 7px 18px #7773;height:max-content;position:sticky;top:10px}
+.cart h2{margin:0;color:#5eaa89;text-align:center}
+.cart-items{max-height:330px;overflow:auto;margin:8px 0}
+.item{display:flex;align-items:center;gap:5px;justify-content:space-between;background:#fff5fa;border-radius:12px;padding:7px;margin:5px 0;font-size:13px}
+.qty{display:flex;align-items:center;gap:4px}
+.qty button{width:25px;height:25px;border-radius:8px;background:#c8eaff}
+.total{border-top:2px dashed #aaa;padding-top:9px;font-size:19px;font-weight:bold;text-align:right}
+.checkout{width:100%;background:#a9e2c7;color:#477663;padding:12px;border-radius:15px;font-weight:bold;margin-top:8px;box-shadow:0 4px #80bea2}
+.clear{width:100%;background:#ffd4e4;color:#765768;padding:8px;border-radius:13px;margin-top:6px}
+.modal{position:fixed;inset:0;background:#52526999;display:none;align-items:center;justify-content:center;padding:15px;z-index:10}
+.modal.show{display:flex}
+.box{background:#fff;border:5px solid white;border-radius:28px;padding:22px;text-align:center;max-width:430px;width:100%;box-shadow:0 10px 30px #3335}
+.money{font-size:65px}
+input{width:100%;padding:12px;border:3px solid #bce3f2;border-radius:13px;font-size:20px;text-align:center}
+.pay{margin-top:9px;background:#bcebd5;padding:11px 22px;border-radius:13px;color:#507565;font-weight:bold}
+.next{margin-top:8px;background:#cbdcff;padding:10px 20px;border-radius:13px;color:#5e6e93;font-weight:bold}
+.msg{min-height:25px;margin:10px;font-weight:bold}
+@media(max-width:750px){.shop{grid-template-columns:1fr}.cart{position:static}.cart-items{max-height:230px}}
+</style>
+</head>
+<body>
+<header>
+<h1>🛒 MiniMart Ceria 🌸</h1>
+<p>Belanja seru di minimarket kartun! 🧸🩵🍀</p>
+</header>
+
+<div class="stats">
+<div class="stat">⭐ Skor: <span id="score">0</span></div>
+<div class="stat">🏆 Level: <span id="level">1</span></div>
+<div class="stat">🧾 Pelanggan: <span id="round">1</span></div>
+</div>
+
+<main class="store">
+<section class="customer">
+<span id="face">👧🏻</span>
+<h2 id="customer">Lala sedang berbelanja 💕</h2>
+<div id="request">Cari barang sesuai daftar belanja pelanggan!</div>
+</section>
+
+<div class="shop">
+<section class="market">
+<div class="sign">🏪 RAK MINIMARKET • PILIH BARANG</div>
+<div class="aisle" id="products"></div>
+</section>
+
+<aside class="cart">
+<h2>🛒 Keranjang</h2>
+<div class="cart-items" id="cart"></div>
+<div class="total">Total<br>Rp <span id="total">0</span></div>
+<button class="checkout" onclick="checkout()">💳 Ke Kasir</button>
+<button class="clear" onclick="clearCart()">🗑️ Kosongkan</button>
+</aside>
+</div>
+</main>
+
+<div class="modal" id="modal">
+<div class="box">
+<div class="money">🧑‍💼💰</div>
+<h2>Meja Kasir</h2>
+<p>Total belanja: <b>Rp <span id="bill">0</span></b></p>
+<p>Masukkan uang pelanggan:</p>
+<input id="money" type="number" min="0" placeholder="Contoh: 20000">
+<button class="pay" onclick="pay()">Bayar 💵</button>
+<div class="msg" id="msg"></div>
+<button class="next" id="next" onclick="nextRound()" style="display:none">Pelanggan Berikutnya ➜</button>
+</div>
+</div>
+
+<script>
+const items=[
+["Apel","🍎",3000],["Pisang","🍌",2500],["Stroberi","🍓",4500],["Roti","🍞",4000],
+["Susu","🥛",5000],["Jus","🧃",5000],["Es Krim","🍦",6000],["Donat","🍩",4000],
+["Biskuit","🍪",3500],["Permen","🍬",2000],["Keju","🧀",5500],["Telur","🥚",3000],
+["Madu","🍯",7000],["Sereal","🥣",6500],["Semangka","🍉",6000],["Wortel","🥕",2500],
+["Kue","🍰",7000],["Pizza","🍕",8000]
+];
+
+const people=[
+["👧🏻","Lala"],["👦🏻","Bimo"],["🐰","Bunny"],["🐻","Momo"],["🦊","Kiki"],["🐼","Panda"]
+];
+
+let cart={},score=0,round=1,level=1,needed=[];
+
+function rupiah(n){return n.toLocaleString("id-ID")}
+function total(){return Object.entries(cart).reduce((s,[i,q])=>s+items[i][2]*q,0)}
+
+function createRequest(){
+ needed=[];
+ let count=Math.min(2+Math.floor((round-1)/2),5);
+ while(needed.length<count){
+  let i=Math.floor(Math.random()*items.length);
+  if(!needed.includes(i))needed.push(i);
+ }
+ let p=people[Math.floor(Math.random()*people.length)];
+ face.textContent=p[0];customer.textContent=p[1]+" sedang berbelanja 💕";
+ request.innerHTML="Tolong carikan: <b>"+needed.map(i=>items[i][0]).join(", ")+"</b> 🛍️";
+}
+
+function renderProducts(){
+ products.innerHTML=items.map((p,i)=>`
+ <div class="product">
+  <div class="emoji">${p[1]}</div>
+  <h3>${p[0]}</h3>
+  <div class="price">Rp ${rupiah(p[2])}</div>
+  <button class="buy" onclick="add(${i})">🛒 Beli</button>
+ </div>`).join("");
+}
+
+function add(i){cart[i]=(cart[i]||0)+1;renderCart()}
+function remove(i){if(cart[i]){cart[i]--;if(cart[i]<=0)delete cart[i]}renderCart()}
+function clearCart(){cart={};renderCart()}
+
+function renderCart(){
+ let keys=Object.keys(cart);
+ if(!keys.length){cartEl().innerHTML='<p style="text-align:center">Keranjang masih kosong 🥺</p>'}
+ else cartEl().innerHTML=keys.map(i=>`
+ <div class="item">
+ <span>${items[i][1]} ${items[i][0]}</span>
+ <div class="qty"><button onclick="remove(${i})">−</button><b>${cart[i]}</b><button onclick="add(${i})">+</button></div>
+ </div>`).join("");
+ totalEl().textContent=rupiah(total());
+}
+function cartEl(){return document.getElementById("cart")}
+function totalEl(){return document.getElementById("total")}
+
+function checkout(){
+ if(!Object.keys(cart).length){alert("Keranjang masih kosong! 🛒");return}
+ bill.textContent=rupiah(total());money.value="";msg.textContent="";next.style.display="none";
+ modal.classList.add("show");
+}
+
+function pay(){
+ let cash=Number(money.value), sum=total();
+ if(cash<sum){msg.textContent="😅 Uangnya belum cukup!";return}
+ let wanted={};needed.forEach(i=>wanted[i]=1);
+ let correct=needed.every(i=>cart[i]===1)&&Object.keys(cart).length===needed.length;
+ let change=cash-sum;
+ if(correct){score+=30;msg.innerHTML="🎉 Sempurna! Semua barang sesuai daftar!<br>Kembalian: Rp "+rupiah(change)}
+ else{score+=10;msg.innerHTML="😊 Pembayaran berhasil!<br>Kembalian: Rp "+rupiah(change)}
+ level=score>=150?3:score>=70?2:1;
+ document.getElementById("score").textContent=score;
+ document.getElementById("level").textContent=level;
+ next.style.display="inline-block";
+}
+
+function nextRound(){
+ modal.classList.remove("show");cart={};round++;
+ document.getElementById("round").textContent=round;
+ createRequest();renderCart();
+}
+
+renderProducts();createRequest();renderCart();
+</script>
+</body>
+</html>
